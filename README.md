@@ -1,82 +1,42 @@
-# Yape Code Challenge :rocket:
+## 🚀 Instrucciones para levantar el entorno
 
-Our code challenge will let you marvel us with your Jedi coding skills :smile:. 
+### 1. Crear archivo .env en la raiz
 
-Don't forget that the proper way to submit your work is to fork the repo and create a PR :wink: ... have fun !!
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=postgres
 
-- [Problem](#problem)
-- [Tech Stack](#tech_stack)
-- [Send us your challenge](#send_us_your_challenge)
+### 2. Instalar las dependencias
 
-# Problem
+npm install
 
-Every time a financial transaction is created it must be validated by our anti-fraud microservice and then the same service sends a message back to update the transaction status.
-For now, we have only three transaction statuses:
+# o 
 
-<ol>
-  <li>pending</li>
-  <li>approved</li>
-  <li>rejected</li>  
-</ol>
+yarn install
 
-Every transaction with a value greater than 1000 should be rejected.
+### 3. Levantar los servicios de base de datos, zookeeper y kafka
 
-```mermaid
-  flowchart LR
-    Transaction -- Save Transaction with pending Status --> transactionDatabase[(Database)]
-    Transaction --Send transaction Created event--> Anti-Fraud
-    Anti-Fraud -- Send transaction Status Approved event--> Transaction
-    Anti-Fraud -- Send transaction Status Rejected event--> Transaction
-    Transaction -- Update transaction Status event--> transactionDatabase[(Database)]
-```
+docker-compose up -d
 
-# Tech Stack
+### 4. Correr la aplicacion 
 
-<ol>
-  <li>Node. You can use any framework you want (i.e. Nestjs with an ORM like TypeOrm or Prisma) </li>
-  <li>Any database</li>
-  <li>Kafka</li>    
-</ol>
+npm run local
 
-We do provide a `Dockerfile` to help you get started with a dev environment.
+# o
 
-You must have two resources:
+yarn local
 
-1. Resource to create a transaction that must containt:
+### 5. Probar los servicios usando los siguientes curl
 
-```json
-{
-  "accountExternalIdDebit": "Guid",
-  "accountExternalIdCredit": "Guid",
+curl --location 'localhost:3000/transaction' \
+--header 'Content-Type: application/json' \
+--data '{
+  "accountExternalIdDebit": "5429d629-c239-45fa-8235-1a386258c536",
+  "accountExternalIdCredit": "d6cd54da-8ce3-4f79-abda-bd5be9b19e68",
   "tranferTypeId": 1,
   "value": 120
-}
-```
+}'
 
-2. Resource to retrieve a transaction
-
-```json
-{
-  "transactionExternalId": "Guid",
-  "transactionType": {
-    "name": ""
-  },
-  "transactionStatus": {
-    "name": ""
-  },
-  "value": 120,
-  "createdAt": "Date"
-}
-```
-
-## Optional
-
-You can use any approach to store transaction data but you should consider that we may deal with high volume scenarios where we have a huge amount of writes and reads for the same data at the same time. How would you tackle this requirement?
-
-You can use Graphql;
-
-# Send us your challenge
-
-When you finish your challenge, after forking a repository, you **must** open a pull request to our repository. There are no limitations to the implementation, you can follow the programming paradigm, modularization, and style that you feel is the most appropriate solution.
-
-If you have any questions, please let us know.
+curl --location 'localhost:3000/transaction/5429d629-c239-45fa-8235-1a386258c536'
